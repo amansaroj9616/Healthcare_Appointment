@@ -18,6 +18,7 @@ A full-stack healthcare appointment scheduling system with emergency triage, tel
 - SQLite (can be switched to PostgreSQL)
 
 ## Features
+![Krishi Banner](https://github.com/amansaroj9616/Healthcare_Appointment/blob/bc54e3a28ca833ce8015679f76367a23db9e5c83/Screenshot%202025-11-21%20225919.png)
 
 ✅ **Doctor Discovery**
 - Filter by specialty, location, telemedicine availability
@@ -208,3 +209,4 @@ Backend:
    ```
 
 The system is ready to use. All features are implemented, including emergency triage, distance warnings, telemedicine chat, and the doctor panel. The code is commented and follows a modular structure.#
+
