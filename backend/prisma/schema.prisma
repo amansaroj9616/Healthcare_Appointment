@@ -1,0 +1,131 @@
+// Prisma Schema for Healthcare Appointment Scheduling System
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Doctor Model
+model Doctor {
+  id                String        @id @default(uuid())
+  name              String
+  specialty         String
+  experienceYears   Int
+  rating            Float         @default(0.0)
+  hospital          String
+  location          String
+  latitude          Float?
+  longitude         Float?
+  telemedicineAvailable Boolean   @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  availability      Availability[]
+  appointments      Appointment[]
+  prescriptions     Prescription[]
+  
+  @@index([specialty])
+  @@index([location])
+}
+
+// Doctor Availability Model
+model Availability {
+  id          String    @id @default(uuid())
+  doctorId    String
+  dayOfWeek   Int       // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime   String    // Format: "HH:MM" (e.g., "09:00")
+  endTime     String    // Format: "HH:MM" (e.g., "17:00")
+  isAvailable Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  doctor      Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  
+  @@index([doctorId, dayOfWeek])
+}
+
+// Appointment Model
+model Appointment {
+  id              String            @id @default(uuid())
+  patientId       String            // Anonymous patient ID from localStorage
+  doctorId        String
+  appointmentDate DateTime
+  timeSlot        String            // Format: "HH:MM"
+  appointmentType String            // "normal" | "emergency"
+  mode            String            // "clinic" | "telemedicine"
+  status          String            @default("scheduled") // "scheduled" | "completed" | "cancelled"
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  doctor          Doctor            @relation(fields: [doctorId], references: [id])
+  emergencyTriage EmergencyTriage?
+  emergencyQueue  EmergencyQueue?
+  telemedicineMessages TelemedicineMessage[]
+  prescriptions   Prescription[]
+  
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([appointmentDate])
+}
+
+// Emergency Triage Model
+model EmergencyTriage {
+  id              String          @id @default(uuid())
+  appointmentId   String          @unique
+  symptoms        String          // JSON array of symptoms
+  emergencyScore  Int
+  severityLevel   String          // "low" | "medium" | "high"
+  patientLat      Float?
+  patientLng      Float?
+  distanceKm      Float?
+  createdAt       DateTime        @default(now())
+  
+  appointment     Appointment     @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+}
+
+// Emergency Queue Model
+model EmergencyQueue {
+  id            String      @id @default(uuid())
+  appointmentId String      @unique
+  status        String      @default("pending") // "pending" | "approved" | "rejected"
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  @@index([status])
+}
+
+// Telemedicine Messages Model
+model TelemedicineMessage {
+  id            String      @id @default(uuid())
+  appointmentId String
+  sender        String      // "doctor" | "patient"
+  message       String
+  createdAt     DateTime    @default(now())
+  
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  
+  @@index([appointmentId])
+}
+
+// Prescription Model
+model Prescription {
+  id            String      @id @default(uuid())
+  appointmentId String
+  doctorId      String
+  medications   String      // JSON array of medications
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  doctor        Doctor      @relation(fields: [doctorId], references: [id])
+  
+  @@index([appointmentId])
+  @@index([doctorId])
+}
+
