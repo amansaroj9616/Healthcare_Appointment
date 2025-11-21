@@ -43,6 +43,7 @@ A full-stack healthcare appointment scheduling system with emergency triage, tel
 - Symptom-based scoring
 - Automatic severity classification
 - Emergency queue management
+  ![healthcare_Appointment](https://github.com/amansaroj9616/Healthcare_Appointment/blob/4558fb7bff82265e851782c4ea4ecbe97660de64/Screenshot%202025-11-21%20231818.png)
 
 ✅ **Geolocation & Distance**
 - Browser geolocation API
@@ -213,5 +214,6 @@ Backend:
    ```
 
 The system is ready to use. All features are implemented, including emergency triage, distance warnings, telemedicine chat, and the doctor panel. The code is commented and follows a modular structure.#
+
 
 
